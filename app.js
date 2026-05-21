@@ -18,13 +18,13 @@ const CONFIG = {
 
 // Fruit types with points and colors
 const FRUIT_TYPES = [
-  { name: 'apple', points: 1, color: '#ef4444', radius: [28, 34] },
-  { name: 'orange', points: 2, color: '#f97316', radius: [30, 36] },
-  { name: 'lemon', points: 2, color: '#fbbf24', radius: [26, 32] },
-  { name: 'lime', points: 1, color: '#22c55e', radius: [26, 32] },
-  { name: 'grape', points: 3, color: '#a855f7', radius: [24, 30] },
-  { name: 'berry', points: 3, color: '#ec4899', radius: [24, 30] },
-  { name: 'watermelon', points: 5, color: '#dc2626', radius: [36, 42] },
+  { name: 'apple', points: 1, color: '#ef4444', radius: [28, 34], texture: 'apple' },
+  { name: 'orange', points: 2, color: '#f97316', radius: [30, 36], texture: 'orange' },
+  { name: 'lemon', points: 2, color: '#fbbf24', radius: [26, 32], texture: 'lemon' },
+  { name: 'lime', points: 1, color: '#22c55e', radius: [26, 32], texture: 'lime' },
+  { name: 'grape', points: 3, color: '#a855f7', radius: [24, 30], texture: 'grape' },
+  { name: 'berry', points: 3, color: '#ec4899', radius: [24, 30], texture: 'berry' },
+  { name: 'watermelon', points: 5, color: '#dc2626', radius: [36, 42], texture: 'watermelon' },
 ];
 
 const GOLDEN_FRUIT = {
@@ -173,23 +173,26 @@ class Fruit extends GameObject {
     ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
     ctx.fill();
 
+    // Draw fruit-specific textures
+    this.drawTexture(ctx, time);
+
     // Juicy highlight (more pronounced)
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
     ctx.beginPath();
     ctx.ellipse(-this.radius * 0.35, -this.radius * 0.35, this.radius * 0.3, this.radius * 0.2, Math.PI / 4, 0, Math.PI * 2);
     ctx.fill();
     
     // Secondary subtle highlight
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
     ctx.beginPath();
     ctx.arc(this.radius * 0.4, this.radius * 0.4, this.radius * 0.15, 0, Math.PI * 2);
     ctx.fill();
 
     // Stem
-    if (!this.isGolden) {
+    if (!this.isGolden && !['watermelon', 'orange', 'lemon', 'lime'].includes(this.fruitType.name)) {
       ctx.fillStyle = '#15803d';
       ctx.fillRect(-2, -this.radius - 4, 4, 6);
-    } else {
+    } else if (this.isGolden) {
       // Sparkles for golden fruit
       ctx.fillStyle = '#fff';
       for (let i = 0; i < 3; i++) {
@@ -202,6 +205,117 @@ class Fruit extends GameObject {
     }
 
     ctx.restore();
+  }
+  
+  drawTexture(ctx, time) {
+    const r = this.radius;
+    const name = this.fruitType.name;
+    
+    if (name === 'apple') {
+      // Apple: small dots and subtle color variation
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+      for (let i = 0; i < 8; i++) {
+        const angle = (i / 8) * Math.PI * 2;
+        const dist = r * 0.5;
+        ctx.beginPath();
+        ctx.arc(Math.cos(angle) * dist, Math.sin(angle) * dist, 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      // Apple dimple at top
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+      ctx.beginPath();
+      ctx.arc(0, -r * 0.7, 4, 0, Math.PI * 2);
+      ctx.fill();
+    } 
+    else if (name === 'orange') {
+      // Orange: pitted texture with small circles
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+      for (let i = 0; i < 20; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = Math.random() * r * 0.7;
+        ctx.beginPath();
+        ctx.arc(Math.cos(angle) * dist, Math.sin(angle) * dist, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    else if (name === 'lemon') {
+      // Lemon: subtle oval patterns
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 5; i++) {
+        const y = -r * 0.5 + (i / 4) * r;
+        ctx.beginPath();
+        ctx.ellipse(0, y, r * 0.6, r * 0.1, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    }
+    else if (name === 'lime') {
+      // Lime: radial segments like citrus cross-section hint
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 8; i++) {
+        const angle = (i / 8) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(Math.cos(angle) * r * 0.8, Math.sin(angle) * r * 0.8);
+        ctx.stroke();
+      }
+    }
+    else if (name === 'grape') {
+      // Grape: cluster of small circles pattern
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+      for (let i = 0; i < 12; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = Math.random() * r * 0.6;
+        ctx.beginPath();
+        ctx.arc(Math.cos(angle) * dist, Math.sin(angle) * dist, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    else if (name === 'berry') {
+      // Berry: tiny seeds on surface
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+      for (let i = 0; i < 15; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = Math.random() * r * 0.7;
+        ctx.beginPath();
+        ctx.arc(Math.cos(angle) * dist, Math.sin(angle) * dist, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    else if (name === 'watermelon') {
+      // Watermelon: dark green stripes on red
+      ctx.fillStyle = 'rgba(0, 50, 0, 0.15)';
+      for (let i = 0; i < 6; i++) {
+        const angle = -Math.PI / 2 + (i / 5) * Math.PI;
+        const startR = r * 0.3;
+        const endR = r;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(angle) * startR, Math.sin(angle) * startR);
+        ctx.quadraticCurveTo(
+          Math.cos(angle) * r * 0.6 + Math.sin(angle) * 10,
+          Math.sin(angle) * r * 0.6 - Math.cos(angle) * 10,
+          Math.cos(angle) * endR,
+          Math.sin(angle) * endR
+        );
+        ctx.lineWidth = 8;
+        ctx.strokeStyle = 'rgba(0, 80, 0, 0.2)';
+        ctx.stroke();
+      }
+      // Watermelon seeds
+      ctx.fillStyle = '#1a1a1a';
+      for (let i = 0; i < 10; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = Math.random() * r * 0.5;
+        ctx.save();
+        ctx.translate(Math.cos(angle) * dist, Math.sin(angle) * dist);
+        ctx.rotate(Math.random() * Math.PI);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 3, 2, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
   }
   
   lightenColor(color, percent) {
@@ -598,9 +712,7 @@ class Game {
     this.audio.playMiss();
     this.updateUI();
     
-    if (this.missed >= CONFIG.MAX_MISSED) {
-      this.gameOver('Too many fruits dropped!');
-    }
+    // Removed game over on missed fruits - only bombs end the game
   }
 
   showFloatingText(x, y, text, color, size) {
@@ -611,10 +723,10 @@ class Game {
     const x = Math.random() * (this.canvas.width - 100) + 50;
     const y = this.canvas.height + 50;
     
-    // Random velocity towards center - INCREASED for higher arcs
-    const targetX = this.canvas.width / 2 + (Math.random() - 0.5) * 200;
-    const vx = (targetX - x) * 0.018; // Slightly more horizontal spread
-    const vy = -(Math.random() * 5 + 14); // Higher vertical velocity (was 11, now 14-19)
+    // Random velocity towards center - MUCH HIGHER for top screen arcs
+    const targetX = this.canvas.width / 2 + (Math.random() - 0.5) * 300;
+    const vx = (targetX - x) * 0.015;
+    const vy = -(Math.random() * 6 + 18); // Much higher: 18-24 vertical velocity
     
     const radius = Math.random() * 6 + 28;
     
