@@ -162,16 +162,27 @@ class Fruit extends GameObject {
       ctx.shadowBlur = 20 * glowIntensity;
     }
 
-    // Main body
-    ctx.fillStyle = this.color;
+    // Main body - juicy gradient
+    const gradient = ctx.createRadialGradient(-this.radius * 0.3, -this.radius * 0.3, this.radius * 0.1, 0, 0, this.radius);
+    gradient.addColorStop(0, this.lightenColor(this.color, 30));
+    gradient.addColorStop(0.5, this.color);
+    gradient.addColorStop(1, this.darkenColor(this.color, 20));
+    
+    ctx.fillStyle = gradient;
     ctx.beginPath();
     ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
     ctx.fill();
 
-    // Highlight
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    // Juicy highlight (more pronounced)
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
     ctx.beginPath();
-    ctx.arc(-this.radius * 0.3, -this.radius * 0.3, this.radius * 0.25, 0, Math.PI * 2);
+    ctx.ellipse(-this.radius * 0.35, -this.radius * 0.35, this.radius * 0.3, this.radius * 0.2, Math.PI / 4, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Secondary subtle highlight
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+    ctx.beginPath();
+    ctx.arc(this.radius * 0.4, this.radius * 0.4, this.radius * 0.15, 0, Math.PI * 2);
     ctx.fill();
 
     // Stem
@@ -191,6 +202,24 @@ class Fruit extends GameObject {
     }
 
     ctx.restore();
+  }
+  
+  lightenColor(color, percent) {
+    const num = parseInt(color.replace('#', ''), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = Math.min(255, (num >> 16) + amt);
+    const G = Math.min(255, ((num >> 8) & 0x00FF) + amt);
+    const B = Math.min(255, (num & 0x0000FF) + amt);
+    return '#' + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
+  }
+  
+  darkenColor(color, percent) {
+    const num = parseInt(color.replace('#', ''), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = Math.max(0, (num >> 16) - amt);
+    const G = Math.max(0, ((num >> 8) & 0x00FF) - amt);
+    const B = Math.max(0, (num & 0x0000FF) - amt);
+    return '#' + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
   }
 }
 
@@ -582,10 +611,10 @@ class Game {
     const x = Math.random() * (this.canvas.width - 100) + 50;
     const y = this.canvas.height + 50;
     
-    // Random velocity towards center
+    // Random velocity towards center - INCREASED for higher arcs
     const targetX = this.canvas.width / 2 + (Math.random() - 0.5) * 200;
-    const vx = (targetX - x) * 0.015;
-    const vy = -(Math.random() * 4 + 11);
+    const vx = (targetX - x) * 0.018; // Slightly more horizontal spread
+    const vy = -(Math.random() * 5 + 14); // Higher vertical velocity (was 11, now 14-19)
     
     const radius = Math.random() * 6 + 28;
     
