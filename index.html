@@ -2,27 +2,59 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Slice It! — a tiny Fruit Ninja</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>Slice It!</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <canvas id="game"></canvas>
-
-  <div id="hud">
-    <span class="hud-label">Score</span>
-    <span id="score">0</span>
-  </div>
-
-  <div id="gameover" class="hidden">
-    <div class="panel">
-      <h1>Game Over</h1>
-      <p>You sliced a bomb!</p>
-      <p class="final">Final score: <span id="finalScore">0</span></p>
-      <button id="playAgain">Play again</button>
+  <div id="ui">
+    <div id="hud" class="hidden">
+      <div id="scoreContainer">
+        <div id="score">0</div>
+        <div id="highScore">Best: 0</div>
+      </div>
+      <div id="comboContainer" class="hidden">
+        <div id="comboMultiplier">x1</div>
+        <div id="comboCount">Combo: 0</div>
+      </div>
+      <div id="missedContainer">
+        <div id="missedLabel">Missed:</div>
+        <div id="missedCount">0/5</div>
+      </div>
+      <button id="pauseBtn">⏸️</button>
+    </div>
+    <div id="startScreen">
+      <h1>🍉 Slice It!</h1>
+      <p class="subtitle">Slice fruits, avoid bombs!</p>
+      <div class="instructions">
+        <p>🎯 Drag to slice fruits</p>
+        <p>💣 Don't hit bombs!</p>
+        <p>⚡ Chain slices for combos</p>
+        <p>⭐ Catch golden fruits for bonus points</p>
+        <p>❌ Don't let fruits fall!</p>
+      </div>
+      <button id="startBtn">🎮 Play</button>
+      <p class="hint">Press P to pause</p>
+    </div>
+    <div id="gameover" class="hidden">
+      <h1>💥 Game Over</h1>
+      <p id="gameOverReason">You hit a bomb!</p>
+      <div id="finalScores">
+        <p>Score: <span id="finalScore">0</span></p>
+        <p>Best: <span id="finalHighScore">0</span></p>
+        <p id="comboRecord">Max Combo: x<span id="maxCombo">0</span></p>
+      </div>
+      <button id="playAgain">🔄 Play Again</button>
+    </div>
+    <div id="pauseScreen" class="hidden">
+      <h1>⏸️ Paused</h1>
+      <button id="resumeBtn">▶️ Resume</button>
+      <button id="quitBtn">🚪 Quit</button>
     </div>
   </div>
-
-  <script src="app.js" defer></script>
+  <script src="app.js"></script>
 </body>
 </html>
